@@ -94,7 +94,25 @@ struct DuelInfo {
 	unsigned short time_left[2];
 	bool isReplaySwapped;
 };
-
+struct ServerInfo {
+	std::wstring name;
+	std::string address;
+	std::string roomaddress;
+	int port;
+	int roomport;
+};
+struct RoomInfo {
+	std::string roomname;
+	int roomid;
+	bool isStarted;
+	bool passwordNeeded;
+	std::string host;
+	bool isMatch;
+	bool isTag;
+	bool isRated;
+	std::string roomdescription;
+	unsigned short banlist;
+};
 struct FadingUnit {
 	bool signalAction;
 	bool isFadein;
@@ -266,6 +284,9 @@ public:
 	uint32 duel_param;
 	uint32 showingcard;
 	bool cardimagetextureloading;
+
+	std::vector<RoomInfo> roomsVector;
+	std::vector<ServerInfo> serversVector; 	
 
 	irr::core::dimension2d<irr::u32> window_size;
 	irr::core::vector2d<irr::f32> window_scale;
