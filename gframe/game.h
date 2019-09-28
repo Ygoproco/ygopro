@@ -285,6 +285,8 @@ public:
 	uint32 showingcard;
 	bool cardimagetextureloading;
 
+	bool return_to_room_browser;
+
 	std::vector<RoomInfo> roomsVector;
 	std::vector<ServerInfo> serversVector; 	
 
