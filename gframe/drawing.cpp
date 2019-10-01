@@ -1101,30 +1101,45 @@ void Game::WaitFrameSignal(int frame) {
 void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, recti* cliprect, bool load_image) {
 	int code = cp->code;
 	int lcode = cp->code;
-	if(!lflist->content.count(lcode) && cp->alias)
-		lcode = cp->alias;
-	irr::video::ITexture* img = load_image ? imageManager.GetTextureThumb(code) : imageManager.tUnknown;
-	if (img == NULL)
+	if(lcode == 0)
+		lcode = code;
+	irr::video::ITexture* img = imageManager.GetTexture(code);
+	if(img == NULL)
 		return; //NULL->getSize() will cause a crash
 	dimension2d<u32> size = img->getOriginalSize();
-	recti dragloc = Resize(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH, pos.Y + CARD_THUMB_HEIGHT);
-	recti limitloc = Resize(pos.X, pos.Y, pos.X + 20, pos.Y + 20);
-	if(drag) {
-		dragloc = recti(pos.X, pos.Y, pos.X + Scale(CARD_THUMB_WIDTH * window_scale.X), pos.Y + Scale(CARD_THUMB_HEIGHT * window_scale.Y));
-		limitloc = recti(pos.X, pos.Y, pos.X + Scale(20 * window_scale.X), pos.Y + Scale(20 * window_scale.Y));
-	}
-	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height), cliprect);
-	if(!is_siding && (lflist->content.count(lcode) || lflist->whitelist)) {
-		switch(lflist->content[lcode]) {
-		case 0:
-			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), cliprect, 0, true);
-			break;
-		case 1:
-			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(64, 0, 128, 64), cliprect, 0, true);
-			break;
-		case 2:
-			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 64, 64, 128), cliprect, 0, true);
-			break;
+
+	if (drag) {
+		recti dragloc = recti(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH * mainGame->window_size.Width / 1024, pos.Y + CARD_THUMB_HEIGHT * mainGame->window_size.Height / 640);
+		recti limitloc = recti(pos.X, pos.Y, pos.X + 20 * mainGame->window_size.Width / 1024, pos.Y + 20 * mainGame->window_size.Height / 640);
+		driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height));
+		if (lflist->content.count(lcode)) {
+			switch(lflist->content[lcode]) {
+			case 0:
+				driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), 0, 0, true);
+				break;
+			case 1:
+				driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(64, 0, 128, 64), 0, 0, true);
+				break;
+			case 2:
+				driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 64, 64, 128), 0, 0, true);
+				break;
+			}
+		}
+	} else {
+		driver->draw2DImage(img, mainGame->Resize(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH, pos.Y + CARD_THUMB_HEIGHT), rect<s32>(0, 0, size.Width, size.Height));
+	
+		if(lflist->content.count(lcode)) {
+			switch(lflist->content[lcode]) {
+				case 0:
+					driver->draw2DImage(imageManager.tLim, mainGame->Resize(pos.X, pos.Y, pos.X + 20, pos.Y + 20), recti(0, 0, 64, 64), 0, 0, true);
+					break;
+				case 1:
+					driver->draw2DImage(imageManager.tLim, mainGame->Resize(pos.X, pos.Y, pos.X + 20, pos.Y + 20), recti(64, 0, 128, 64), 0, 0, true);
+					break;
+				case 2:
+					driver->draw2DImage(imageManager.tLim, mainGame->Resize(pos.X, pos.Y, pos.X + 20, pos.Y + 20), recti(0, 64, 64, 128), 0, 0, true);
+					break;
+			}
 		}
 	}
 }
